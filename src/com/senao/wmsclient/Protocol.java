@@ -4,12 +4,8 @@ public abstract class Protocol
 {
 	/** WMP Command **/
 	static public int msnSequence = 0;
-	static public final int AUTHORIZATION_REQUEST = 0x00000004;
-	static public final int AUTHORIZATION_RESPONSE = 0x80000004;
-	static public final int AUTHENTICATION_REQUEST = 0x00000002;
-	static public final int AUTHENTICATION_RESPONSE = 0x80000002;
-	static public final int FIRMWARE_UPDATE_REQUEST = 0x00000007;
-	static public final int FIRMWARE_UPDATE_RESPONSE = 0x80000007;
+	static public final int WMP_HEADER_SIZE = 16;
+
 	static public final int BIND_REQUEST = 0x00000001;
 	static public final int BIND_RESPONSE = 0x80000001;
 	static public final int UNBIND_REQUEST = 0x00000006;
@@ -18,7 +14,14 @@ public abstract class Protocol
 	static public final int ENQUIRE_LINK_RESPONSE = 0x80000015;
 	static public final int ACCESS_LOG_REQUEST = 0x00000003;
 	static public final int ACCESS_LOG_RESPONSE = 0x80000003;
-	static public final int WMP_HEADER_SIZE = 16;
+	static public final int AUTHORIZATION_REQUEST = 0x00000004;
+	static public final int AUTHORIZATION_RESPONSE = 0x80000004;
+	static public final int AUTHENTICATION_REQUEST = 0x00000002;
+	static public final int AUTHENTICATION_RESPONSE = 0x80000002;
+	static public final int FIRMWARE_UPDATE_REQUEST = 0x00000007;
+	static public final int FIRMWARE_UPDATE_RESPONSE = 0x80000007;
+	static public final int USER_ACCOUNT_UPDATE_REQUEST = 0x00000008;
+	static public final int USER_ACCOUNT_UPDATE_RESPONSE = 0x80000008;
 
 	static public final int STATUS_ROK = 0x00000000;
 	static public final int STATUS_RINVMSGLEN = 0x00000001;
