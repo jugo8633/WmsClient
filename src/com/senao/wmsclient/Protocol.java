@@ -22,6 +22,10 @@ public abstract class Protocol
 	static public final int FIRMWARE_UPDATE_RESPONSE = 0x80000007;
 	static public final int USER_ACCOUNT_UPDATE_REQUEST = 0x00000008;
 	static public final int USER_ACCOUNT_UPDATE_RESPONSE = 0x80000008;
+	static public final int CLIENT_REBOOT_REQUEST = 0x00000010;
+	static public final int CLIENT_REBOOT_RESPONSE = 0x80000010;
+	static public final int CONFIG_REQUEST = 0x00000011;
+	static public final int CONFIG_RESPONSE = 0x80000011;
 
 	static public final int STATUS_ROK = 0x00000000;
 	static public final int STATUS_RINVMSGLEN = 0x00000001;
@@ -39,6 +43,7 @@ public abstract class Protocol
 	static public final int STATUS_RINVBODY = 0x00000010;
 	static public final int STATUS_RINVCLIENTMAC = 0x00000011;
 	static public final int STATUS_RINVURL = 0x00000012;
+	static public final int STATUS_RINVCONFIG = 0x00000013;
 
 	static public class WMP_HEADER
 	{

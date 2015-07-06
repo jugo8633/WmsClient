@@ -520,6 +520,58 @@ public class WmsClient
 		return nResult;
 	}
 
+	public int client_reboot_request(HashMap<String, String> respData) throws ConnectException, IOException
+	{
+		if (!validSocket())
+			return ERR_SOCKET_INVALID;
+
+		if (null == respData)
+		{
+			return ERR_INVALID_PARAM;
+		}
+
+		int nResult = UNKNOW;
+		final int nSequence = getSequence();
+		OutputStream outSocket = msocket.getOutputStream();
+		InputStream inSocket = msocket.getInputStream();
+
+		int nLength = Protocol.WMP_HEADER_SIZE;
+		ByteBuffer buf = ByteBuffer.allocate(nLength);
+		buf.putInt(nLength);
+		buf.putInt(Protocol.CLIENT_REBOOT_REQUEST);
+		buf.putInt(Protocol.STATUS_ROK);
+		buf.putInt(nSequence);
+
+		respData.put("REQ_LENGTH", String.valueOf(nLength));
+		respData.put("REQ_ID", "client_reboot_request");
+		respData.put("REQ_STATUS", "0");
+		respData.put("REQ_SEQUENCE", String.valueOf(nSequence));
+
+		buf.flip();
+		outSocket.write(buf.array());
+		buf.clear();
+
+		buf = ByteBuffer.allocate(Protocol.WMP_HEADER_SIZE);
+		nLength = inSocket.read(buf.array());
+		buf.rewind();
+		if (Protocol.WMP_HEADER_SIZE == nLength)
+		{
+			nResult = checkResponse(buf, nSequence);
+			buf.order(ByteOrder.BIG_ENDIAN);
+			respData.put("RESP_LENGTH", String.valueOf(buf.getInt(0)));
+			respData.put("RESP_ID", String.valueOf(buf.getInt(4) & 0x00ffffff));
+			respData.put("RESP_STATUS", String.valueOf(buf.getInt(8)));
+			respData.put("RESP_SEQUENCE", String.valueOf(buf.getInt(12)));
+		}
+		else
+		{
+			nResult = ERR_PACKET_LENGTH;
+		}
+		buf.clear();
+		buf = null;
+		return nResult;
+	}
+
 	public int access_log_request(final String strClientMAC, final String strDestAddr, final String strDestPort, final String strWebUrl,
 			HashMap<String, String> respData)
 			throws ConnectException, IOException
@@ -532,12 +584,14 @@ public class WmsClient
 			return ERR_INVALID_PARAM;
 		}
 
+		String strDeviceMAC = "simulator";
+
 		int nResult = UNKNOW;
 		final int nSequence = getSequence();
 		OutputStream outSocket = msocket.getOutputStream();
 		InputStream inSocket = msocket.getInputStream();
 
-		int nLength = Protocol.WMP_HEADER_SIZE + strClientMAC.length() + 1 + strDestAddr.length() + 1
+		int nLength = Protocol.WMP_HEADER_SIZE + strDeviceMAC.length() + 1 + strClientMAC.length() + 1 + strDestAddr.length() + 1
 				+ strDestPort.length() + 1 + strWebUrl.length() + 1;
 		ByteBuffer buf = ByteBuffer.allocate(nLength);
 		buf.putInt(nLength);
@@ -549,6 +603,10 @@ public class WmsClient
 		respData.put("REQ_ID", "access_log_request");
 		respData.put("REQ_STATUS", "0");
 		respData.put("REQ_SEQUENCE", String.valueOf(nSequence));
+
+		buf.put(strDeviceMAC.getBytes("US-ASCII"));
+		buf.put(strDelim.getBytes("US-ASCII"));
+		respData.put("REQ_BODY_DEVICE_MAC", strDeviceMAC);
 
 		buf.put(strClientMAC.getBytes("US-ASCII"));
 		buf.put(strDelim.getBytes("US-ASCII"));
@@ -573,6 +631,68 @@ public class WmsClient
 		buf = ByteBuffer.allocate(Protocol.WMP_HEADER_SIZE);
 		nLength = inSocket.read(buf.array());
 		buf.rewind();
+		if (Protocol.WMP_HEADER_SIZE == nLength)
+		{
+			nResult = checkResponse(buf, nSequence);
+			buf.order(ByteOrder.BIG_ENDIAN);
+			respData.put("RESP_LENGTH", String.valueOf(buf.getInt(0)));
+			respData.put("RESP_ID", String.valueOf(buf.getInt(4) & 0x00ffffff));
+			respData.put("RESP_STATUS", String.valueOf(buf.getInt(8)));
+			respData.put("RESP_SEQUENCE", String.valueOf(buf.getInt(12)));
+		}
+		else
+		{
+			nResult = ERR_PACKET_LENGTH;
+		}
+		buf.clear();
+		buf = null;
+		return nResult;
+	}
+
+	public int config_request(final String strItem, final String strValue, HashMap<String, String> respData) throws ConnectException,
+			IOException
+	{
+		if (!validSocket())
+			return ERR_SOCKET_INVALID;
+
+		if (null == respData || null == strItem || null == strValue)
+		{
+			return ERR_INVALID_PARAM;
+		}
+
+		int nResult = UNKNOW;
+		final int nSequence = getSequence();
+		OutputStream outSocket = msocket.getOutputStream();
+		InputStream inSocket = msocket.getInputStream();
+
+		int nLength = Protocol.WMP_HEADER_SIZE + strItem.length() + 1 + strValue.length() + 1;
+		ByteBuffer buf = ByteBuffer.allocate(nLength);
+		buf.putInt(nLength);
+		buf.putInt(Protocol.CONFIG_REQUEST);
+		buf.putInt(0);
+		buf.putInt(nSequence);
+
+		respData.put("REQ_LENGTH", String.valueOf(nLength));
+		respData.put("REQ_ID", "config_request");
+		respData.put("REQ_STATUS", "0");
+		respData.put("REQ_SEQUENCE", String.valueOf(nSequence));
+
+		buf.put(strItem.getBytes("US-ASCII"));
+		buf.put(strDelim.getBytes("US-ASCII"));
+		respData.put("REQ_BODY_CONFIG_ITEM", strItem);
+
+		buf.put(strValue.getBytes("US-ASCII"));
+		buf.put((byte) 0);
+		respData.put("REQ_BODY_CONFIG_VALUE", strValue);
+
+		buf.flip();
+		outSocket.write(buf.array());
+		buf.clear();
+
+		buf = ByteBuffer.allocate(Protocol.WMP_HEADER_SIZE);
+		nLength = inSocket.read(buf.array());
+		buf.rewind();
+		
 		if (Protocol.WMP_HEADER_SIZE == nLength)
 		{
 			nResult = checkResponse(buf, nSequence);
